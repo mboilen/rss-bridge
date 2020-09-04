@@ -38,6 +38,8 @@ class VBulletinBridge extends BridgeAbstract {
     const LAST_PAGE = 99999;
     const BOLD_PATTERN = '/<b>\s*(\w[^<]*)<\/b>/m';
     const BR_PATTERN = '/\s*(\w[^<>]*)<br\s*(?:\/)?>/m';
+
+    private ?string $name = null;
     
 
     public function getURI() {
@@ -47,7 +49,11 @@ class VBulletinBridge extends BridgeAbstract {
     private function makeURI($tid, $page) {
         return rtrim($this->getURI() . "/t" . $tid . "-p" . $page . ".html");
     }
-    
+
+    public function getName() {
+        return $this->name ?: parent::getName();
+    }
+
 
     public function collectData() {
         $tid = $this->getInput('tid');
@@ -71,6 +77,10 @@ class VBulletinBridge extends BridgeAbstract {
             //Debug::log("Fetching page with timeout " . $cacheTimeout);
             $html = getSimpleHTMLDOMCached($pageUri, $cacheTimeout)
                 or returnServerError("Could not request " . $pageUri);
+
+            if (is_null($this->name)) {
+                $this->name = $html->find('table[class="tborder awn-ignore"] td[class="navbar"] strong', 0)->innertext;
+            }
             $nextHref = $html->find('a[rel="prev"]', 0);
             if (is_null($nextHref)) {
                 //Debug::log("nextHref was null");
