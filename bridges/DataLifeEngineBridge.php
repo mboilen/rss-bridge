@@ -5,7 +5,7 @@ class DataLifeEngineBridge extends BridgeAbstract {
     const MAINTAINER = 'No maintainer';
     const CACHE_TIMEOUT = 3600;
 
-       const PARAMETERS = array(
+    const PARAMETERS = array(
         array(
             'uri' => array(
                 'name' => 'URI',
@@ -23,8 +23,14 @@ class DataLifeEngineBridge extends BridgeAbstract {
         )
     );
 
+    private ?string $name = null;
+
     public function getURI() {
         return $this->getInput('uri');
+    }
+
+    public function getName() {
+        return $this->name ? : parent::getName();
     }
 
     public function collectData(){
@@ -34,6 +40,10 @@ class DataLifeEngineBridge extends BridgeAbstract {
         while (!is_null($uri) && ($limit == 0 || count($this->items) < $limit)) {
             $html = getSimpleHTMLDOM($uri)
                 or returnServerError('No contents received!');
+
+            if (is_null($this->name)) {
+                $this->name = $html->find('head title', 0)->innertext;
+            }
 
             foreach ($html->find('article') as $article) {
                 $item = array();
