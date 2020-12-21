@@ -48,7 +48,7 @@ class DataLifeEngineBridge extends BridgeAbstract {
             foreach ($html->find('article') as $article) {
                 $item = array();
 
-                $titleAnchor = $article->find('h2[class="title"] a', 0);
+                $titleAnchor = $article->find('h2 a', 0);
                 Debug::log('URI is ' . $titleAnchor->innertext);
                 Debug::log('HREF is ' . $titleAnchor->href);
                 $item['uri'] = $titleAnchor->href;
@@ -81,7 +81,7 @@ class DataLifeEngineBridge extends BridgeAbstract {
                 $this->items[] = $item;
             }
 
-            $next = $html->find('div [class="navigation"] div[class="page"] span[class="next"] a', 0);
+            $next = $html->find('div[class="block page_nav"] span[class="next"] a', 0);
             if (is_null($next))
                 $uri = null;
             else
